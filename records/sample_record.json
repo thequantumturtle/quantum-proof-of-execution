@@ -1,0 +1,33 @@
+{
+  "execution": {
+    "backend": "qasm_simulator",
+    "finished_at": "2026-01-14T02:01:24Z",
+    "result_digest": "204399c3405cc720fd288a81cdcd52536c4e7a9c502529128c1ea43baa8d093f",
+    "result_summary": {
+      "000": 512,
+      "010": 200,
+      "111": 312
+    },
+    "started_at": "2026-01-14T02:01:23Z"
+  },
+  "record": {
+    "created_at": "2026-01-14T02:01:24Z",
+    "hash": "2ef536e340b583f59f1f30e8c294ff09d658612e2019f4ab1ace1ad5b7ca9f99",
+    "hash_alg": "sha256",
+    "public_key": null,
+    "record_id": "6f2f6d63-3c7a-4f88-9f55-7aa7c93f1e2b",
+    "signature": null,
+    "signature_alg": "none"
+  },
+  "schema_version": "0.1",
+  "workload": {
+    "name": "toy-param-circuit",
+    "parameters": {
+      "depth": 2,
+      "n_qubits": 3,
+      "theta": 1.234
+    },
+    "sdk": "qiskit",
+    "shots": 1024
+  }
+}

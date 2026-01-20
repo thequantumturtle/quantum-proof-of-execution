@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "quantum-proof-of-execution"
+version = "0.1.0"
+description = "Toy proof-of-execution pipeline across quantum SDKs"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+keywords = ["quantum", "qiskit", "cirq", "blockchain", "records"]
+dependencies = [
+  "qiskit",
+  "qiskit-aer",
+  "cirq",
+  "cryptography",
+  "numpy",
+]
