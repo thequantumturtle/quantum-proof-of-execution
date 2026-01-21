@@ -4,6 +4,7 @@ from typing import Dict, Tuple
 import cirq
 
 WORKLOAD_NAME = "clifford_t_sampling"
+FRAMEWORK_VERSION = cirq.__version__
 CLIFFORD_GATES = (cirq.H, cirq.S, cirq.X, cirq.Y, cirq.Z)
 
 

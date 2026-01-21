@@ -43,7 +43,7 @@ def main():
     workload = load_workload(root / "qiskit_impl" / "workload.py")
 
     try:
-        counts = workload.run_workload(
+        counts, _circuit, _backend = workload.run_workload(
             n_qubits=args.n_qubits,
             depth=args.depth,
             seed=args.seed,

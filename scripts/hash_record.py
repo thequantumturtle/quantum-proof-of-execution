@@ -1,22 +1,28 @@
 import argparse
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 
-def canonical_json(data):
-    return json.dumps(data, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+def canonical_json_bytes(obj):
+    payload = json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    return payload.encode("utf-8")
 
 
-def payload_from_record(record):
+def sha256_prefixed(data: bytes) -> str:
+    digest = hashlib.sha256(data).hexdigest()
+    return f"sha256:{digest}"
+
+
+def record_core(record):
     return {
-        "schema_version": record["schema_version"],
+        "schema": record["schema"],
         "workload": record["workload"],
         "execution": record["execution"],
-        "record": {
-            "record_id": record["record"]["record_id"],
-            "created_at": record["record"]["created_at"],
-            "hash_alg": record["record"]["hash_alg"],
+        "results": record["results"],
+        "artifacts": {
+            "circuit_hash": record["artifacts"]["circuit_hash"],
         },
     }
 
@@ -27,9 +33,11 @@ def main():
     args = parser.parse_args()
 
     record = json.loads(Path(args.record_path).read_text(encoding="utf-8"))
-    payload = payload_from_record(record)
-    computed_hash = hashlib.sha256(canonical_json(payload).encode("utf-8")).hexdigest()
-    print(computed_hash)
+    computed = sha256_prefixed(canonical_json_bytes(record_core(record)))
+    print(computed)
+    stored = record.get("artifacts", {}).get("record_hash")
+    if stored and stored != computed:
+        print("Warning: stored record_hash does not match computed value", file=sys.stderr)
 
 
 if __name__ == "__main__":
