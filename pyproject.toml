@@ -5,11 +5,9 @@ build-backend = "hatchling.build"
 [project]
 name = "quantum-proof-of-execution"
 version = "0.1.0"
-description = "Toy proof-of-execution pipeline across quantum SDKs"
+description = "Experimental reference implementation for recording, verifying, and attesting to quantum execution across frameworks."
 readme = "README.md"
 requires-python = ">=3.11"
-license = { text = "MIT" }
-keywords = ["quantum", "qiskit", "cirq", "blockchain", "records"]
 dependencies = [
   "qiskit",
   "qiskit-aer",
@@ -17,3 +15,6 @@ dependencies = [
   "cryptography",
   "numpy",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["quantum_proof_of_execution"]

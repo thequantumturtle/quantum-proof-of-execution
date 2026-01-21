@@ -11,16 +11,15 @@ This project is experimental and for research/education only. It is not a consen
 ## Quickstart
 
 ```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -e .
-
-python scripts\run_qiskit.py --shots 1024
-python scripts\run_cirq.py --shots 1024
-
+python -m pip install .
 python scripts\make_record.py --sdk qiskit --out records\sample_record.json
-python scripts\verify_record.py records\sample_record.json
-python scripts\hash_record.py records\sample_record.json
+```
+
+## Docker
+
+```bash
+docker build -t quantum-proof-of-execution .
+docker run --rm quantum-proof-of-execution python scripts/run_qiskit.py --shots 256
 ```
 
 ## Record Schema (High Level)
