@@ -4,6 +4,8 @@ import importlib.util
 import sys
 from pathlib import Path
 
+import qiskit
+
 
 def load_workload(module_path):
     spec = importlib.util.spec_from_file_location("workload", module_path)
@@ -59,7 +61,14 @@ def main():
             "seed": args.seed,
             "shots": args.shots,
         },
-        "counts": counts,
+        "execution": {
+            "framework": "qiskit",
+            "framework_version": qiskit.__version__,
+            "backend": "qiskit_aer.AerSimulator",
+        },
+        "results": {
+            "counts": counts,
+        },
     }
     print(json.dumps(payload, sort_keys=True, indent=2))
 

@@ -61,11 +61,14 @@ def main():
             "seed": args.seed,
             "shots": args.shots,
         },
-        "backend": {
-            "name": backend_name,
+        "execution": {
+            "framework": "cirq",
+            "framework_version": cirq.__version__,
+            "backend": backend_name,
         },
-        "cirq_version": cirq.__version__,
-        "counts": counts,
+        "results": {
+            "counts": counts,
+        },
     }
     print(json.dumps(payload, sort_keys=True, indent=2))
 
