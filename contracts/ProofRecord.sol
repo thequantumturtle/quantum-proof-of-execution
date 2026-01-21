@@ -2,23 +2,35 @@
 pragma solidity ^0.8.20;
 
 contract ProofRecord {
-    event RecordAnchored(bytes32 indexed recordHash, address indexed sender, string metadata);
+    event Submitted(bytes32 indexed recordHash, address indexed submitter, uint256 timestamp);
 
-    struct Anchor {
+    struct Submission {
+        address submitter;
         uint256 timestamp;
-        address sender;
-        string metadata;
     }
 
-    mapping(bytes32 => Anchor) public anchors;
+    mapping(bytes32 => Submission) private submissions;
 
-    function anchor(bytes32 recordHash, string calldata metadata) external {
-        require(anchors[recordHash].timestamp == 0, "Already anchored");
-        anchors[recordHash] = Anchor({
-            timestamp: block.timestamp,
-            sender: msg.sender,
-            metadata: metadata
-        });
-        emit RecordAnchored(recordHash, msg.sender, metadata);
+    function submit(bytes32 recordHash) external {
+        require(recordHash != bytes32(0), "invalid hash");
+        if (submissions[recordHash].timestamp == 0) {
+            submissions[recordHash] = Submission({
+                submitter: msg.sender,
+                timestamp: block.timestamp
+            });
+        }
+        emit Submitted(recordHash, msg.sender, block.timestamp);
+    }
+
+    function getSubmitter(bytes32 recordHash) external view returns (address) {
+        return submissions[recordHash].submitter;
+    }
+
+    function getTimestamp(bytes32 recordHash) external view returns (uint256) {
+        return submissions[recordHash].timestamp;
+    }
+
+    function exists(bytes32 recordHash) external view returns (bool) {
+        return submissions[recordHash].timestamp != 0;
     }
 }

@@ -12,7 +12,8 @@ This project is experimental and for research/education only. It is not a consen
 
 ```bash
 python -m pip install .
-python scripts\make_record.py --sdk qiskit --out records\sample_record.json
+python scripts/make_record.py --framework qiskit --n-qubits 4 --depth 10 --seed 123 --shots 2000 --out records/qiskit.json
+python scripts/verify_record.py records/qiskit.json
 ```
 
 ## Docker
@@ -22,67 +23,47 @@ docker build -t quantum-proof-of-execution .
 docker run --rm quantum-proof-of-execution python scripts/run_qiskit.py --shots 256
 ```
 
-## Execution Records
-
-Execution records capture the workload parameters, execution metadata, results, and hashes,
-with an Ed25519 signature over the record hash.
-
-### Expected Workflows
-
-The typical flow is:
-
-1. Run a workload (Qiskit or Cirq) to produce counts and confirm parameters.
-2. Create a signed execution record with `make_record.py`.
-3. Verify the record integrity and signature with `verify_record.py`.
-4. (Optional) Extract and compare the `record_hash` for anchoring or audit logs.
-
-If you are iterating on workloads, regenerate the record after any code or parameter change.
-The `circuit_hash` and `record_hash` should change whenever the circuit or record core changes.
-
-Create records:
-
-```bash
-python scripts/make_record.py --framework qiskit --n-qubits 4 --depth 10 --seed 123 --shots 2000 --out records/qiskit.json
-python scripts/make_record.py --framework cirq --n-qubits 4 --depth 10 --seed 123 --shots 2000 --out records/cirq.json
-```
-
-Verify and inspect hashes:
-
-```bash
-python scripts/verify_record.py records/qiskit.json
-python scripts/hash_record.py records/qiskit.json
-```
-
-Docker Compose workflow (containerized equivalent of the create/verify/hash steps above):
+## Docker Compose
 
 ```bash
 docker compose run --rm qiskit
 docker compose run --rm cirq
 ```
 
-Record hashing details:
+## Docker Quickstart (Records)
 
-- `circuit_hash` is `sha256` of the serialized circuit output.
-- `record_hash` is `sha256` of the canonical JSON for the record core (no attestation, and
-  `artifacts` includes only `circuit_hash`).
-- Signatures use Ed25519 over the raw 32-byte digest for the `record_hash` value.
+```bash
+docker build -t quantum-proof-of-execution:dev .
+
+docker run --rm -v "${PWD}:/app" quantum-proof-of-execution:dev \
+  python scripts/make_record.py --framework qiskit --n-qubits 4 --depth 10 --seed 123 --shots 2000 --out records/qiskit.json
+
+docker run --rm -v "${PWD}:/app" quantum-proof-of-execution:dev \
+  python scripts/verify_record.py records/qiskit.json
+```
+
+## Execution Records
+
+Execution records capture the workload parameters, execution metadata, results, and hashes,
+with an Ed25519 signature over the record hash.
+
+If you are iterating on workloads, regenerate the record after any code or parameter change.
+The `circuit_hash` and `record_hash` should change whenever the circuit or record core changes.
 
 ## Record Schema (High Level)
 
 Records are JSON documents with the following top-level fields:
 
-- schema_version: string
-- workload: { name, sdk, parameters, shots }
-- execution: { backend, started_at, finished_at, result_summary, result_digest }
-- record: { record_id, created_at, hash_alg, hash, signature_alg, signature, public_key }
+- schema: string
+- workload: { name, n_qubits, depth, seed, shots }
+- execution: { framework, framework_version, backend, started_at, finished_at }
+- results: { counts }
+- artifacts: { circuit_hash, record_hash }
+- attestation: { signing_alg, public_key, signature }
 
-The record hash is computed over a canonical JSON payload containing:
+Hashing and signatures:
 
-- schema_version
-- workload
-- execution
-- record: { record_id, created_at, hash_alg }
-
-The signature (when present) signs the hash bytes. See scripts/make_record.py and scripts/verify_record.py for the exact logic.
-
-Note: records/sample_record.json is intentionally unsigned (signature_alg: none) to keep it lightweight and illustrative. Run scripts/make_record.py to generate a signed record.
+- `circuit_hash` is `sha256` of the serialized circuit output.
+- `record_hash` is `sha256` of the canonical JSON for the record core (no attestation, and
+  `artifacts` includes only `circuit_hash`).
+- Signatures use Ed25519 over the raw 32-byte digest for the `record_hash` value.

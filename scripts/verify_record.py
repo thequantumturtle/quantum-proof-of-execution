@@ -48,6 +48,11 @@ def main():
     parser.add_argument("record_path")
     args = parser.parse_args()
 
+    if not Path(args.record_path).exists():
+        raise FileNotFoundError(
+            f"{args.record_path} not found. If running in Docker, did you mount the project directory?"
+        )
+
     record = json.loads(Path(args.record_path).read_text(encoding="utf-8"))
     if "artifacts" not in record or "attestation" not in record:
         fail("Record missing artifacts or attestation section")
