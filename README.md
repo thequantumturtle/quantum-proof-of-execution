@@ -8,37 +8,25 @@ This repo demonstrates a toy "proof of execution" pipeline by running the same p
 
 This project is experimental and for research/education only. It is not a consensus protocol, not a security primitive, and does not claim quantum advantage.
 
-## Quickstart
+## Design Goals
 
-```bash
-python -m pip install .
-python scripts/make_record.py --framework qiskit --n-qubits 4 --depth 10 --seed 123 --shots 2000 --out records/qiskit.json
-python scripts/verify_record.py records/qiskit.json
-```
+- clarity over hype
+- explicit trust boundaries
+- portability across quantum SDKs
+- deterministic, inspectable execution artifacts
+- non-custodial on-chain anchoring
 
-## Docker
+## Quickstart (Docker)
 
-```bash
-docker build -t quantum-proof-of-execution .
-docker run --rm quantum-proof-of-execution python scripts/run_qiskit.py --shots 256
-```
-
-## Docker Compose
-
-```bash
-docker compose run --rm qiskit
-docker compose run --rm cirq
-```
-
-## Docker Quickstart (Records)
+The volume mount is required because containers are ephemeral and records must persist outside the container.
 
 ```bash
 docker build -t quantum-proof-of-execution:dev .
 
-docker run --rm -v "${PWD}:/app" quantum-proof-of-execution:dev \
+docker run --rm -v "${PWD}:/app" quantum-proof-of-execution:dev `
   python scripts/make_record.py --framework qiskit --n-qubits 4 --depth 10 --seed 123 --shots 2000 --out records/qiskit.json
 
-docker run --rm -v "${PWD}:/app" quantum-proof-of-execution:dev \
+docker run --rm -v "${PWD}:/app" quantum-proof-of-execution:dev `
   python scripts/verify_record.py records/qiskit.json
 ```
 
@@ -67,3 +55,14 @@ Hashing and signatures:
 - `record_hash` is `sha256` of the canonical JSON for the record core (no attestation, and
   `artifacts` includes only `circuit_hash`).
 - Signatures use Ed25519 over the raw 32-byte digest for the `record_hash` value.
+
+## What This Is NOT
+
+- not proof-of-work
+- not a consensus mechanism
+- not cryptoeconomic security
+- not a claim of quantum advantage
+- not custodial and does not move funds
+- not a production system
+
+See docs/non_claims.md for additional non-claims.
